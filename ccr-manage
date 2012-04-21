@@ -18,7 +18,18 @@ manage() { # change this function name to something that makes more sense
       echo "Where is the '$pkg' PKGBUILD?"
       echo -n "> "
       read pkgb
-      [[ -w "$pkgb" ]] || (echo "That file is not writable."; exit 1) || continue
+      if ! [[ -w "$pkgb" ]]; then
+        echo "That file is not writable."
+        echo -n "Would you like to download this package to the working dir? [Y/n] "
+        read ans
+        if [[ $ans == n || $ans == N || $ans == no || $ans == NO ]]; then
+           continue
+        else
+           ccr -G $pkg && rm $pkg.tar.gz
+           [[ -w "$pkg/PKGBUILD" ]] && pkgb="$pkg/PKGBUILD" || (
+             echo "could not find PKGBUILD. :("; exit 1) || continue
+        fi
+      fi
     fi
 
     # compare version numbers and update PKGBUILDs

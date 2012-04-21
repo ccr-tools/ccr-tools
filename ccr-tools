@@ -288,7 +288,7 @@ submit() {
     fi
 
     # get the pkgname from the archive
-    pkgname=$(tar -xzOf $pkgargs --no-anchored 'PKGBUILD' | sed -n "s/pkgname=['\"]\?\([^'\"]*\)['\"]\?/\1/p")
+    pkgname=$(tar -xzOf $pkgargs --no-anchored 'PKGBUILD' | sed -n "s/^pkgname=['\"]\?\([^'\"]*\)['\"]\?/\1/p")
 
     if ! existsinccr $pkgname && [[ $catvalue == 1 ]]; then
         err "Since $pkgname is not in CCR yet. You must provide a category."
