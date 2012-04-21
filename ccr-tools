@@ -1,7 +1,9 @@
 #!/bin/bash
 ver=0.2
 tempdir=$(mktemp -d)
-configrc=$HOME/.config/ccr-toolsrc
+configdir=$HOME/.config/ccr-tools
+configrc=${configdir}/ccr-toolsrc
+pkgupdrc=${configdir}/pkgupdrc
 ccrbaseurl="http://chakra-linux.org/ccr/"
 rpcurl="${ccrbaseurl}rpc.php?type"
 ccrurl="${ccrbaseurl}packages.php"
@@ -67,6 +69,7 @@ usage() {
     echo "          --category,   -C    category for new packages"
     echo "ccr-tools -sC                 list all valid categories"
     echo "ccr-tools --maintainer, -m    list all packages by maintainer"
+    echo "ccr-tools --update,     -U    update packages PKGBUILD"
     echo
     echo " example:  ccr-tools --vote shake bfilter"
     echo
@@ -162,6 +165,51 @@ maintainer() {
         column -t -s '@' | cut -c1-$(tput cols)
 
     exit
+}
+
+checkupd() {
+    # get the variables from the file into memory
+    [[ -n $pkgupdrc ]] && source "$pkgupdrc"  || echo "'$pkgupdrc' is invalid or cannot be read."
+
+    local pkglist=$(sed -n '/^[[:space:]]*#/!s/\(.*\)=.*/\1/p' $pkgupdrc)
+
+    for pkg in "${pkglist}"; do 
+        local pkgvar="$(echo $pkg | sed 's/-/_/g')"
+
+        # find PKGBUILDs
+        if [[ -w "$pkg/PKGBUILD" ]]; then
+            pkgb="$pkg/PKGBUILD"
+        elif [[ -w "$pkg/$pkg/PKGBUILD" ]]; then
+            pkgb="$pkg/PKGBUILD"
+        else
+            echo "Where is the '$pkg' PKGBUILD?"
+            echo -n "> "
+            read pkgb
+            [[ -w "$pkgb" ]] || (echo "That file is not writable."; exit 1) || continue
+        fi
+
+        # compare version numbers and update PKGBUILDs
+        local npkgver="$(eval echo \$$pkgvar)"
+        local opkgver="$(grep "^pkgver=.*" "$pkgb" | sed 's/pkgver=//')"
+        if [[ $npkgver > $opkgver ]]; then
+            if [[ $dontask != 1 ]]; then
+                echo -e "New version of $pkg found: $npkgver\nOld version: $opkgver"
+                echo -n "Would you like to update the pkgbuild? [Y/n] "
+                read ans
+            else
+                ans=y
+            fi
+            if [[ $ans == n || $ans == N || $ans == no || $ans == NO ]]; then
+                echo "Not updating $pkg PKGBUILD."
+                continue
+            else
+                sed -i "s/pkgver=$opkgver/pkgver=$npkgver/" "$pkgb"
+                sed -i 's/^pkgrel=.*/pkgrel=1/' "$pkgb"
+                upkgz+=("$pkg")
+            fi
+        fi
+    done
+    echo "PKGBUILDs updated: ${upkgz[@]-None}"
 }
 
 vote() {
@@ -312,6 +360,9 @@ while [ "$#" -ne "0" ]; do
     --maintainer|-m) shift 
         maintainer=$1 
         maintainer
+        ;;
+    --update|-U)
+        checkupd
         ;;
     --*|-*)        echo "ccr-tools: Option \`$1' is not valid." ; exit 5 ;;
 	esac
