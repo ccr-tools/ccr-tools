@@ -171,7 +171,7 @@ checkupd() {
     # get the variables from the file into memory
     [[ -n $pkgupdrc ]] && source "$pkgupdrc"  || echo "'$pkgupdrc' is invalid or cannot be read."
 
-    local pkglist=$(sed -n '/^[[:space:]]*#/!s/\(.*\)=.*/\1/p' $pkgupdrc)
+    local pkglist=$(sed -n '/^[[:space:]]*#/!s/\([^=]*\)=.*/\1/p' $pkgupdrc)
 
     for pkg in "${pkglist}"; do 
         local pkgvar="$(echo $pkg | sed 's/-/_/g')"
@@ -190,7 +190,7 @@ checkupd() {
 
         # compare version numbers and update PKGBUILDs
         local npkgver="$(eval echo \$$pkgvar)"
-        local opkgver="$(grep "^pkgver=.*" "$pkgb" | sed 's/pkgver=//')"
+        local opkgver="$(sed -n 's/^pkgver=(.*)/\1/p' "$pkgb")"
         if [[ $npkgver > $opkgver ]]; then
             if [[ $dontask != 1 ]]; then
                 echo -e "New version of $pkg found: $npkgver\nOld version: $opkgver"
@@ -203,7 +203,7 @@ checkupd() {
                 echo "Not updating $pkg PKGBUILD."
                 continue
             else
-                sed -i "s/pkgver=$opkgver/pkgver=$npkgver/" "$pkgb"
+                sed -i "s/^pkgver=$opkgver/pkgver=$npkgver/" "$pkgb"
                 sed -i 's/^pkgrel=.*/pkgrel=1/' "$pkgb"
                 upkgz+=("$pkg")
             fi
