@@ -1,7 +1,8 @@
 #!/bin/bash
 ver=0.2
 tempdir="/tmp/ccr-tools-$UID"
-configrc=$HOME/.config/ccr-tools/config
+configdir="$HOME/.config/ccr-tools"
+configrc="$configdir/config"
 ccrbaseurl="http://chakra-linux.org/ccr/"
 rpcurl="${ccrbaseurl}rpc.php?type"
 ccrurl="${ccrbaseurl}packages.php"
@@ -9,6 +10,7 @@ idurl="${ccrbaseurl}rpc.php?type=info&arg="
 voteurl="${ccrbaseurl}packages.php"
 checkurl="${ccrbaseurl}packages.php?ID="
 submiturl="${ccrbaseurl}pkgsubmit.php"
+mkdir -p "$configdir"
 mkdir -p "$tempdir"
 
 # Defining some functions needed by main program
@@ -109,7 +111,7 @@ EOF
     fi
       
     [[ -r "$configrc" ]] && source $configrc
-    rememberme=${rememberme-1}
+    rememberme=${rememberme:-1} # default to 1 if not set
 }
 
 expired() {
@@ -130,20 +132,26 @@ login() {
 
     # logs in to ccr and keeps session alive
     umask 077
-    if [[ ! -e "$tempdir/cjar" || $rememberme != 1 || $(expired) == 1 ]]; then
-      [[ $(expired) == 1 ]] && echo "Your session has expired."
-      while [[ -z $user ]]; do read -p "please enter your CCR username: " user; done
-      while [[ -z $pass ]]; do read -p "please enter your CCR password: " -s pass && echo; done
-      [[ $rememberme == 1 ]] && args=('-d' 'remember_me=on')
-      curl -Ss --cookie-jar "$tempdir/cjar" --output /dev/null ${ccrbaseurl} 
-      curl -Ss --cookie "$tempdir/cjar" --cookie-jar "$tempdir/cjar"  \
+    failure=0
+    curl -Ss --cookie-jar "$tempdir/cjar" --output /dev/null ${ccrbaseurl} || failure=1
+    if [[ $failure = 0 && ( ! -e "$tempdir/cjar" || $rememberme != 1 || $(expired) == 1 ) ]]; then
+        [[ $(expired) == 1 ]] && echo "Your session has expired."
+        while [[ -z $user ]]; do read -p "please enter your CCR username: " user; done
+        while [[ -z $pass ]]; do read -p "please enter your CCR password: " -s pass && echo; done
+        [[ $rememberme == 1 ]] && args=('-d' 'remember_me=on')
+        curl -Ss --cookie "$tempdir/cjar" --cookie-jar "$tempdir/cjar"  \
                --data "user=$user" --data-urlencode "passwd=$pass" \
                --location --output "$tempdir/ccrvote.login"  \
-               ${args[@]} ${ccrbaseurl}
+               ${args[@]} ${ccrbaseurl} || failure=1
+        
+        if grep --quiet "'error'>Bad username or password" "$tempdir/ccrvote.login";then
+            echo "incorrect password: check $configrc file"
+            die 1
+        fi
     fi
-
-    if grep --quiet "'error'>Bad username or password" "$tempdir/ccrvote.login";then
-        echo "incorrect password: check $configrc file"
+    
+    if [[ ! $failure = 0 ]]; then
+        echo "Failure (no connection?)"
         die 1
     fi
 }
