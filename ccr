@@ -298,6 +298,9 @@ ccrinstall() {
     err "No PKGBUILD found in directory."
   fi
 
+  # Source makepkg.conf for every build
+  sourcemakepkgconf
+
   # Allow user to edit .install
   unset install
   . PKGBUILD
