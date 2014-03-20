@@ -3,7 +3,7 @@ ver=0.2
 tempdir="/tmp/ccr-tools-$UID"
 configdir="$HOME/.config/ccr-tools"
 configrc="$configdir/config"
-ccrbaseurl="http://chakra-project.org/ccr/"
+ccrbaseurl="http://chakraos.org/ccr/"
 rpcurl="${ccrbaseurl}rpc.php?type"
 ccrurl="${ccrbaseurl}packages.php"
 idurl="${ccrbaseurl}rpc.php?type=info&arg="
