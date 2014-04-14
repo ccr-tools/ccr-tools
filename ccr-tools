@@ -202,7 +202,7 @@ notify() {
     [[ -z ${pkgargs[@]} ]] && echo "You must specify a package." && die 1
     for pkgname in ${pkgargs[@]}; do
         ccrid=$(getccrid $pkgname)
-        [[ -z "$ccrid" ]] && echo "$pkgname was not found on CCR" && continue
+        [[ -z "$ccrid" ]] && echo "$pkgname was not found on CCR, or was already notified" && continue
 
         if curl -Ss --cookie "$tempdir/cjar" --cookie-jar "$tempdir/cjar" --data "IDs[${ccrid}]=1" \
             --data "ID=${ccrid}" --data "do_Notify=1" \
