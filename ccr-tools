@@ -196,6 +196,26 @@ vote() {
     die 0
 }
 
+notify() {
+    login
+
+    [[ -z ${pkgargs[@]} ]] && echo "You must specify a package." && die 1
+    for pkgname in ${pkgargs[@]}; do
+        ccrid=$(getccrid $pkgname)
+        [[ -z "$ccrid" ]] && echo "$pkgname was not found on CCR" && continue
+
+        if curl -Ss --cookie "$tempdir/cjar" --cookie-jar "$tempdir/cjar" --data "IDs[${ccrid}]=1" \
+            --data "ID=${ccrid}" --data "do_Notify=1" \
+            --output /dev/null ${voteurl}; then
+            echo "now notified for $pkgname"
+        else
+            echo "ERROR: Can't access $ccrurl"
+        fi
+    done
+
+    die 0
+}
+
 unvote() {
     login
 
@@ -325,6 +345,10 @@ while [ "$#" -ne "0" ]; do
     --unvote|-u) shift
         pkgargs=$@
         unvote
+        ;;
+    --notify|-n) shift
+        pkgargs=$@
+        notify
         ;;
     --comment) shift
         comment=$1; shift
