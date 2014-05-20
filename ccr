@@ -307,6 +307,9 @@ ccrinstall() {
     err "No PKGBUILD found in directory."
   fi
 
+  # Source makepkg.conf for every build
+  sourcemakepkgconf
+
   # Allow user to edit .install
   unset install
   . PKGBUILD
@@ -331,7 +334,6 @@ ccrinstall() {
 installhandling() {
   packageargs=("$@")
   getignoredpackages
-  sourcemakepkgconf
   # Figure out all of the packages that need to be installed
   for package in "${packageargs[@]}"; do
     # Determine whether package is in pacman repos
