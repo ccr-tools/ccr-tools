@@ -143,7 +143,7 @@ scrapeccrdeps() {
   pkginfo "$1"
   . "$tmpdir/$1.PKGBUILD"
   IFS=$'\n'
-  dependencies=( $(echo -e "${depends[*]}\n${makedepends[*]}" | sed -e 's/=.*//' -e 's/>.*//' -e 's/<.*//'| sort -u) )
+  dependencies=( $(echo -e "${depends[*]}\n${makedepends[*]}\n${checkdepends[*]}" | sed -e 's/=.*//' -e 's/>.*//' -e 's/<.*//'| sort -u) )
 }
 
 # Finds dependencies of package $1
