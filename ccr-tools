@@ -1,5 +1,5 @@
 #!/bin/bash
-ver=4.0.2
+ver=4.0.3
 tempdir="/tmp/ccr-tools-$UID"
 configdir="$HOME/.config/ccr-tools"
 configrc="$configdir/config"
