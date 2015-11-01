@@ -3,7 +3,7 @@ ver=4.0.3
 tempdir="/tmp/ccr-tools-$UID"
 configdir="$HOME/.config/ccr-tools"
 configrc="$configdir/config"
-ccrbaseurl="http://chakraos.org/ccr/"
+ccrbaseurl="https://chakraos.org/ccr/"
 rpcurl="${ccrbaseurl}rpc.php?type"
 ccrurl="${ccrbaseurl}packages.php"
 idurl="${ccrbaseurl}rpc.php?type=info&arg="
@@ -52,7 +52,7 @@ err() {
 version() {
     echo "ccr-tools - version $ver"
     echo
-    echo " http://ccr-tools.github.com/"
+    echo " https://ccr-tools.github.com/"
     exit
 }
 
@@ -79,7 +79,7 @@ usage() {
     echo "pass=YOUR_CCR_PASS"
     echo
     echo "To create a new account just go to:"
-    echo "http://chakra-linux.org/ccr/account.php"
+    echo "https://chakraos.org/ccr/account.php"
     exit
 }
 
