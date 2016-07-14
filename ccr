@@ -4,7 +4,7 @@
 #
 # Ccr is a fork of Packer by Matthew Bruenig <matthewbruenig@gmail.com>
 # Licensed under GPL version 3
-ccrver=4.0.3
+ccrver=4.0.5
 
 # prevent running the script as root
 if [[ $EUID == 0 ]] && ! [[ $1 == "-Ss" || $1 == "-Si" || $1 == "-Ssq" || $1 == "-G" ]]; then
@@ -22,8 +22,8 @@ makepkgconf='/etc/makepkg.conf'
 usermakepkgconf="$HOME/.makepkg.conf"
 pacmanconf='/etc/pacman.conf'
 
-RPCURL="http://chakraos.org/ccr/rpc.php?type"
-PKGURL="http://chakraos.org/ccr/packages"
+RPCURL="https://chakralinux.org/ccr/rpc.php?type"
+PKGURL="https://chakralinux.org/ccr/packages"
 
 if [[ -t 1 && ! $COLOR = "NO" ]]; then
   COLOR1='\e[1;39m'
