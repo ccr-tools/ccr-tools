@@ -1,10 +1,10 @@
 #!/bin/bash
 #
-# CCR - A Chakra Community Repository helper
+# ccr - A Chakra Community Repository helper
 #
-# Ccr is a fork of Packer by Matthew Bruenig <matthewbruenig@gmail.com>
+# ccr is a fork of Packer by Matthew Bruenig <matthewbruenig@gmail.com>
 # Licensed under GPL version 3
-ccrver=4.0.5
+ccrver=4.0.6
 
 # prevent running the script as root
 if [[ $EUID == 0 ]] && ! [[ $1 == "-Ss" || $1 == "-Si" || $1 == "-Ssq" || $1 == "-G" ]]; then
