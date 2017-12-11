@@ -4,7 +4,7 @@
 #
 # Ccr is a fork of Packer by Matthew Bruenig <matthewbruenig@gmail.com>
 # Licensed under GPL version 3
-ccrver=4.0.4
+ccrver=4.0.5
 
 # prevent running the script as root
 if [[ $EUID == 0 ]] && ! [[ $1 == "-Ss" || $1 == "-Si" || $1 == "-Ssq" || $1 == "-G" ]]; then
